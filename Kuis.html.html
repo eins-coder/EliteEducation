@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Placement Test for Elementary School</title>
+    <style>
+        /* CSS */
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #ff6b6b;
+            text-align: center;
+        }
+        .intro {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .quiz-container {
+            display: none;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e6f7ff;
+            border-radius: 10px;
+        }
+        .options label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        .result-container {
+            display: none;
+            text-align: center;
+        }
+        .result-container h2 {
+            color: #ff6b6b;
+        }
+        .level {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #4CAF50;
+        }
+        .emoji {
+            font-size: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Halaman Utama -->
+        <div id="home-container">
+            <h1> English Placement Test of ELITE EDUCATION</h1>
+            <div class="intro">
+                <p>Welcome to the English test for elementary school students!</p>
+                <p>There are 15 multiple-choice questions. Choose the best answer!</p>
+                <button class="btn" id="start-btn">Start Test</button>
+            </div>
+        </div>
+
+        <!-- Halaman Kuis -->
+        <div id="quiz-container" class="quiz-container">
+            <h2>Question <span id="question-number">1</span>/15</h2>
+            <div id="question-container" class="question">
+                <!-- Pertanyaan akan dimuat di sini oleh JavaScript -->
+            </div>
+            <button class="btn" id="prev-btn">Previous</button>
+            <button class="btn" id="next-btn">Next</button>
+            <button class="btn" id="submit-btn" style="display: none;">Submit Test</button>
+        </div>
+
+        <!-- Halaman Hasil -->
+        <div id="result-container" class="result-container">
+            <h2>Your Test Result</h2>
+            <div class="emoji" id="result-emoji">🎉</div>
+            <p>You scored <span id="score">0</span> out of 15!</p>
+            <div class="level" id="level">Beginner</div>
+            <p id="feedback">Keep practicing! You can do better!</p>
+            <button class="btn" id="retry-btn">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript
+        const questions = [
+            {
+                question: "The opposite of 'happy' is:",
+                options: ["Sad", "Angry", "Tall"],
+                answer: 0
+            },
+            {
+                question: "A place where you borrow books is called a:",
+                options: ["Hospital", "Library", "School"],
+                answer: 1
+            },
+            {
+                question: "She ___ to school every day.",
+                options: ["Go", "Goes", "Going"],
+                answer: 1
+            },
+            {
+                question: "Which sentence is correct?",
+                options: ["I has a book.", "I have a book.", "I having a book."],
+                answer: 1
+            },
+            {
+                question: "Tom has a red bicycle. He rides it to the park every Sunday. What color is Tom's bicycle?",
+                options: ["Blue", "Red", "Green"],
+                answer: 1
+            },
+            {
+                question: "Which word is a fruit?",
+                options: ["Carrot", "Apple", "Broccoli"],
+                answer: 1
+            },
+            {
+                question: "The plural of 'child' is:",
+                options: ["Childs", "Children", "Childes"],
+                answer: 1
+            },
+            {
+                question: "Which word is spelled correctly?",
+                options: ["Happpy", "Happy", "Hapy"],
+                answer: 1
+            },
+            {
+                question: "What do you use to write on paper?",
+                options: ["A book", "A pencil", "A chair"],
+                answer: 1
+            },
+            {
+                question: "Which sentence is in the past tense?",
+                options: ["I eat lunch.", "I eating lunch.", "I ate lunch."],
+                answer: 2
+            },
+            {
+                question: "What is the capital of England?",
+                options: ["Paris", "London", "New York"],
+                answer: 1
+            },
+            {
+                question: "Which animal says 'meow'?",
+                options: ["Dog", "Cat", "Cow"],
+                answer: 1
+            },
+            {
+                question: "Complete the sentence: I ___ watching TV right now.",
+                options: ["am", "is", "are"],
+                answer: 0
+            },
+            {
+                question: "Which word is a color?",
+                options: ["Table", "Blue", "Run"],
+                answer: 1
+            },
+            {
+                question: "What do you say when you meet someone in the morning?",
+                options: ["Good night", "Good morning", "Good afternoon"],
+                answer: 1
+            }
+        ];
+
+        // Variabel state
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+
+        // Elemen DOM
+        const homeContainer = document.getElementById('home-container');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const questionNumber = document.getElementById('question-number');
+        const questionContainer = document.getElementById('question-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const feedbackElement = document.getElementById('feedback');
+        const emojiElement = document.getElementById('result-emoji');
+
+        // Event Listeners
+        document.getElementById('start-btn').addEventListener('click', startQuiz);
+        prevBtn.addEventListener('click', showPreviousQuestion);
+        nextBtn.addEventListener('click', showNextQuestion);
+        submitBtn.addEventListener('click', showResult);
+        document.getElementById('retry-btn').addEventListener('click', retryQuiz);
+
+        // Fungsi untuk memulai kuis
+        function startQuiz() {
+            homeContainer.style.display = 'none';
+            quizContainer.style.display = 'block';
+            showQuestion();
+        }
+
+        // Fungsi menampilkan pertanyaan
+        function showQuestion() {
+            questionNumber.textContent = currentQuestion + 1;
+            const question = questions[currentQuestion];
+            
+            let optionsHTML = '';
+            question.options.forEach((option, index) => {
+                const isChecked = userAnswers[currentQuestion] === index ? 'checked' : '';
+                optionsHTML += `
+                    <label>
+                        <input type="radio" name="answer" value="${index}" ${isChecked}>
+                        ${String.fromCharCode(97 + index)}) ${option}
+                    </label>
+                `;
+            });
+            
+            questionContainer.innerHTML = `
+                <p>${question.question}</p>
+                <div class="options">${optionsHTML}</div>
+            `;
+
+            // Update tombol navigasi
+            prevBtn.style.display = currentQuestion === 0 ? 'none' : 'inline-block';
+            nextBtn.style.display = currentQuestion === questions.length - 1 ? 'none' : 'inline-block';
+            submitBtn.style.display = currentQuestion === questions.length - 1 ? 'inline-block' : 'none';
+        }
+
+        // Fungsi untuk menyimpan jawaban
+        function saveAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestion] = parseInt(selectedOption.value);
+            }
+        }
+
+        // Fungsi navigasi pertanyaan
+        function showNextQuestion() {
+            saveAnswer();
+            currentQuestion++;
+            showQuestion();
+        }
+
+        function showPreviousQuestion() {
+            saveAnswer();
+            currentQuestion--;
+            showQuestion();
+        }
+
+        // Fungsi menampilkan hasil
+        function showResult() {
+            saveAnswer();
+            
+            // Hitung skor
+            score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].answer) {
+                    score++;
+                }
+            });
+            
+            // Tampilkan hasil
+            quizContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            scoreElement.textContent = score;
+            
+            // Tentukan level
+            let level, feedback, emoji;
+            if (score >= 13) {
+                level = "Advanced";
+                feedback = "Excellent! You're really good at English!";
+                emoji = "🌟";
+            } else if (score >= 9) {
+                level = "Intermediate";
+                feedback = "Good job! You understand basic English well.";
+                emoji = "👍";
+            } else if (score >= 5) {
+                level = "Basic";
+                feedback = "Not bad! Keep learning and practicing!";
+                emoji = "🙂";
+            } else {
+                level = "Beginner";
+                feedback = "Don't worry! Everyone starts somewhere. Keep trying!";
+                emoji = "🤗";
+            }
+            
+            levelElement.textContent = level;
+            feedbackElement.textContent = feedback;
+            emojiElement.textContent = emoji;
+        }
+
+        // Fungsi mengulang kuis
+        function retryQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            resultContainer.style.display = 'none';
+            homeContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
